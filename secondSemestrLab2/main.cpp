@@ -14,8 +14,8 @@ void discardContract();
 
 
 void main() {
- /*   string dir = getDirectory();
-    createFiles(dir);*/
+    string dir = getDirectory();
+    createFiles(dir);
     discardContract();
 }
 
@@ -36,21 +36,28 @@ void createFiles(string dir) {
 void discardContract() {
     string number;
     string line;
-  
-    ifstream in("C:\\Users\OlhaShevel\Desktop\New folder\students1.csv");
-   
-        if (in.is_open()) {
-            getline(in, number);
-            int num = stoi(number);
-            cout << num;
-            for (int i = 1; i = num; i++) {
-                getline(in, line);
-                int pos = line.find_last_not_of(',');
-                
-                cout<< line.substr(pos, line.length());
-            }
 
-        
+    ifstream in("C:\\Users\\OlhaShevel\\Desktop\\new_folder\\students1.csv");
+    ofstream out("C:\\Users\\OlhaShevel\\Desktop\\new_folder\\temp.csv");
+  
+
+    if (in.is_open()) {
+        getline(in, number);
+        int num = stoi(number);
+        cout << num;
+        for (int i = 1; i < num; i++) {
+            getline(in, line);
+            int pos = line.find_last_of(',') + 1;
+
+            string status = line.substr(pos, line.length());
+            cout << status;
+            if (status == "FALSE") {
+                out << line << endl;
+            }
         }
-       // in.close();
+
+
+
+    }
 }
+       // in.close();

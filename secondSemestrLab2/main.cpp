@@ -9,7 +9,7 @@ using namespace std;
 
 string getDirectory();
 void createFiles(string dir);
-void discardContract();
+void discardContract(string dir, vector <string> allFiles);
 
 vector<string> findCsv(string dir);
 //void discardContract();
@@ -20,9 +20,12 @@ vector<string> findCsv(string dir);
 
 void main() {
     string dir = getDirectory();
-    createFiles(dir);
-    discardContract();
+
     vector<string> csvFiles = findCsv(dir);
+ //   createFiles(dir);
+
+  
+    discardContract(dir, csvFiles);
 }
 
 
@@ -34,36 +37,44 @@ string getDirectory() {
     return dir;
 }
 
-void createFiles(string dir) {
-    ofstream fout(dir + "rating.csv");
-    ofstream temp(dir + "temp.csv");
-}
+//void createFiles(string dir) {
+//    ofstream fout(dir + "\\rating.csv");
+//    ofstream temp(dir + "\\temp.csv");
+//}
 
-void discardContract() {
+void discardContract(string dir, vector<string> allFiles) {
     string number;
     string line;
+    ofstream out(dir + "\\temp.csv");
+ 
+    for (int i = 0; i < allFiles.size(); i++)
+    {
 
-    ifstream in("C:\\Users\\OlhaShevel\\Desktop\\new_folder\\students1.csv");
-    ofstream out("C:\\Users\\OlhaShevel\\Desktop\\new_folder\\temp.csv");
-  
 
-    if (in.is_open()) {
-        getline(in, number);
-        int num = stoi(number);
-        cout << num;
-        for (int i = 1; i < num; i++) {
-            getline(in, line);
-            int pos = line.find_last_of(',') + 1;
+        ifstream in(dir + "\\" + allFiles[i]);
+     //   ofstream out(dir + "\\temp.csv");
 
-            string status = line.substr(pos, line.length());
-            cout << status;
-            if (status == "FALSE") {
-                out << line << endl;
+
+        if (in.is_open()) {
+            getline(in, number);
+            cout << number;
+            int num = stoi(number);
+            cout << num;
+            
+            for (int j = 1; j < num; j++) {
+                getline(in, line);
+                int pos = line.find_last_of(',') + 1;
+
+                string status = line.substr(pos, line.length());
+                cout << status;
+                if (status == "FALSE") {
+                    out << line.substr(0, pos) << endl;
+                }
             }
+
+
+
         }
-
-
-
     }
 }
        // in.close();

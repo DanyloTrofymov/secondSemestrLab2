@@ -5,12 +5,14 @@
 #include <direct.h>
 #include <io.h>
 #include <iomanip>
+#include <cstdio>
 using namespace std;
 string getDirectory();      //gets directory 
 //void createFiles(string dir);
 int discardContract(string dir, vector <string> allFiles); // writes all students with attribute FALSE in csv, returns count of non-contract students
 vector<string> findCsv(string dir); // Finds all .csv files in directiry 
 void averageScore(string dir, int count); // counts the avarage score of every student
+void deleteFile(string dir, string name);
 //void sort(); // sotrs list of students by avarage score
 //void ratingOut();
 
@@ -38,7 +40,7 @@ int discardContract(string dir, vector<string> allFiles) {
     int count = 0; // counts not contract students
     string number;
     string line;
-    ofstream out(dir + "\\temp.csv");
+    ofstream out(dir + "\\ratingTemp.csv");
     
     for (int i = 0; i < allFiles.size(); i++)
     {
@@ -84,8 +86,14 @@ vector<string> findCsv(string dir) {
     //searching .csv files function
     _finddata_t data;
     intptr_t handle = _findfirst(charDir, &data);
+    int i = 0;
     do {
         allFiles.push_back(data.name);
+        if (allFiles[i] == "ratingTemp2.csv") {
+            deleteFile(dir, "\\ratingTemp2.csv");
+            allFiles.erase(allFiles.begin() + i);
+        }
+        else i++;
     } while (_findnext(handle, &data) == 0);
     _findclose(handle);
 
@@ -93,8 +101,8 @@ vector<string> findCsv(string dir) {
 }
 
 void averageScore(string dir, int count) {
-    ifstream in(dir + "\\temp.csv");
-    ofstream out(dir + "\\temp2.csv");
+    ifstream in(dir + "\\ratingTemp.csv");
+    ofstream out(dir + "\\ratingTemp2.csv");
     string line;
     double average = 0;
     for (int i = 0; i < count; i++) {
@@ -113,4 +121,21 @@ void averageScore(string dir, int count) {
     }
     in.close();
     out.close();
+    deleteFile(dir, "\\ratingTemp.csv");
+}
+
+void deleteFile(string dir, string name) {
+    char charDir[200];
+    for (int i = 0; i < dir.length(); i++) // writes directory in const char
+    {
+        charDir[i] = dir[i];
+    }
+
+    int j = 0;
+    for (int i = dir.length(); i < dir.length() + name.length() + 1; i++)   // writes file type in const char
+    {
+        charDir[i] = name[j];
+        j++;
+    }
+    remove(charDir);
 }

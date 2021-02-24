@@ -4,22 +4,22 @@
 #include <vector>
 #include <direct.h>
 #include <io.h>
+#include <iomanip>
 using namespace std;
 string getDirectory();      //gets directory 
 //void createFiles(string dir);
-void discardContract(string dir, vector <string> allFiles); // writes all students with attribute FALSE in csv
-
+int discardContract(string dir, vector <string> allFiles); // writes all students with attribute FALSE in csv, returns count of non-contract students
 vector<string> findCsv(string dir); // Finds all .csv files in directiry 
-//void averageScore(); // counts the avarage score of every student
+void averageScore(string dir, int count); // counts the avarage score of every student
 //void sort(); // sotrs list of students by avarage score
 //void ratingOut();
 
-
 void main() {
-    setlocale(LC_ALL, " ");
+    setlocale(LC_ALL, "Russian");
     string dir = getDirectory();
     vector<string> csvFiles = findCsv(dir);
-    discardContract(dir, csvFiles);
+    int budget = discardContract(dir, csvFiles);
+    averageScore(dir, budget);
 }
 
 string getDirectory() {
@@ -34,7 +34,8 @@ string getDirectory() {
 //    ofstream temp(dir + "\\temp.csv");
 //}
 
-void discardContract(string dir, vector<string> allFiles) {
+int discardContract(string dir, vector<string> allFiles) {
+    int count = 0; // counts not contract students
     string number;
     string line;
     ofstream out(dir + "\\temp.csv");
@@ -52,6 +53,7 @@ void discardContract(string dir, vector<string> allFiles) {
                 string status = line.substr(pos, line.length());
                 if (status == "FALSE") {
                     out << line.substr(0, pos-1) << endl;
+                    count++;
                 }
             }
             
@@ -59,9 +61,8 @@ void discardContract(string dir, vector<string> allFiles) {
         in.close();
     }
     out.close();
+    return count;
 }
-
-
 
 vector<string> findCsv(string dir) {
     vector<string> allFiles;
@@ -89,4 +90,27 @@ vector<string> findCsv(string dir) {
     _findclose(handle);
 
     return allFiles;
+}
+
+void averageScore(string dir, int count) {
+    ifstream in(dir + "\\temp.csv");
+    ofstream out(dir + "\\temp2.csv");
+    string line;
+    double average = 0;
+    for (int i = 0; i < count; i++) {
+        getline(in, line);
+        for (int j = 0; j < 5; j++)
+        {
+            int pos = line.find_last_of(',');
+            string score = line.substr(pos + 1);
+            average += stod(score);
+            line.erase(pos);
+        }
+        average /= 5;
+        string result = to_string(average);
+        out << line << "," << result.substr(0, 6) << endl;
+        average = 0;
+    }
+    in.close();
+    out.close();
 }

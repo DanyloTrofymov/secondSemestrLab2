@@ -10,13 +10,12 @@
 
 using namespace std;
 string getDirectory();      //gets directory 
-//void createFiles(string dir);
 int discardContract(string dir, vector <string> allFiles); // writes all students with attribute FALSE in csv, returns count of non-contract students
 vector<string> findCsv(string dir); // Finds all .csv files in directiry 
 void averageScore(string dir, int count); // counts the avarage score of every student
 void deleteFile(string dir, string name);
 void sorting(string dir, int count); // sotrs list of students by avarage score
-//void ratingOut();
+void ratingOut(string dir, int count);
 
 void main() {
     setlocale(LC_ALL, "Russian");
@@ -25,6 +24,7 @@ void main() {
     int budget = discardContract(dir, csvFiles);
     averageScore(dir, budget);
     sorting(dir, budget);
+    ratingOut(dir, budget);
 }
 
 string getDirectory() {
@@ -34,10 +34,6 @@ string getDirectory() {
     return dir;
 }
 
-//void createFiles(string dir) {
-//    ofstream fout(dir + "\\rating.csv");
-//    ofstream temp(dir + "\\temp.csv");
-//}
 
 int discardContract(string dir, vector<string> allFiles) {
     int count = 0; // counts not contract students
@@ -188,3 +184,22 @@ void sorting(string dir, int count) {
     }
     out.close();
 }
+
+void ratingOut(string dir, int count) {
+    ifstream in(dir + "\\ratingTemp3.csv");
+    ofstream out(dir + "\\rating.csv");
+    string line;
+    int limit = 40;
+ 
+    for (int i = 0; i < (count*limit)/100; i++) {
+        getline(in, line);
+        out << line << endl;
+        cout << line << endl;
+        if (i == ((count * limit) / 100) - 1) {
+            cout << "Minimal score for scholarship: " << line.substr(line.find_last_of(",") + 1) << endl;
+        }
+    }
+    in.close();
+    out.close();
+}
+

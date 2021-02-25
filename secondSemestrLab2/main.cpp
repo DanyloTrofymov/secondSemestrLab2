@@ -6,6 +6,8 @@
 #include <io.h>
 #include <iomanip>
 #include <cstdio>
+#include <algorithm>
+
 using namespace std;
 string getDirectory();      //gets directory 
 //void createFiles(string dir);
@@ -13,7 +15,7 @@ int discardContract(string dir, vector <string> allFiles); // writes all student
 vector<string> findCsv(string dir); // Finds all .csv files in directiry 
 void averageScore(string dir, int count); // counts the avarage score of every student
 void deleteFile(string dir, string name);
-//void sort(); // sotrs list of students by avarage score
+void sorting(string dir, int count); // sotrs list of students by avarage score
 //void ratingOut();
 
 void main() {
@@ -22,6 +24,7 @@ void main() {
     vector<string> csvFiles = findCsv(dir);
     int budget = discardContract(dir, csvFiles);
     averageScore(dir, budget);
+    sorting(dir, budget);
 }
 
 string getDirectory() {
@@ -116,6 +119,8 @@ void averageScore(string dir, int count) {
         }
         average /= 5;
         string result = to_string(average);
+        int pos2 = result.find_last_of(',');
+        result[pos2] = '.';
         out << line << "," << result.substr(0, 6) << endl;
         average = 0;
     }
@@ -138,4 +143,48 @@ void deleteFile(string dir, string name) {
         j++;
     }
     remove(charDir);
+}
+
+void sorting(string dir, int count) {
+    vector<string> rating;
+    ifstream in(dir + "\\ratingTemp2.csv");
+    for (int i = 0; i < count; i++)
+    {
+        string line;
+        string score;
+        getline(in, line);
+        int pos = line.find_last_of(',')+1;
+        score = line.substr(pos);
+        bool isExist = false;
+        for (int i = 0; i < rating.size(); i++)
+        {
+            if (score == rating[i]) isExist = true;
+        }
+        if (isExist) continue;
+        else rating.push_back(score);
+    }
+    in.close();
+
+
+    sort(rating.rbegin(), rating.rend(), greater<string>());
+
+    string line;
+    string score;
+    ofstream out(dir + "\\ratingTemp3.csv");
+    for (int i = rating.size()-1; i >= 0; i--)
+    {
+        ifstream in2(dir + "\\ratingTemp2.csv");
+        for (int j = 0; j < count; j++)
+        {
+            getline(in2, line);
+            int pos = line.find_last_of(',') + 1;
+            score = line.substr(pos);
+            if (rating[i] == score) {
+                out << line << endl;
+            }
+        }
+        in2.close();
+        rating.erase(rating.begin() + i);
+    }
+    out.close();
 }

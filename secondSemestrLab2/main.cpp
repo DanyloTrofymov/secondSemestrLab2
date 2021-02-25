@@ -9,12 +9,13 @@
 #include <algorithm>
 
 using namespace std;
-string getDirectory();      //gets directory 
+string getDirectory();      
 int discardContract(string dir, vector <string> allFiles); // writes all students with attribute FALSE in csv, returns count of non-contract students
 vector<string> findCsv(string dir); // Finds all .csv files in directiry 
 void averageScore(string dir, int count); // counts the avarage score of every student
-void deleteFile(string dir, string name);
-void sorting(string dir, int count); // sotrs list of students by avarage score
+void deleteFile(string dir, string name); 
+vector<string> sortScores(string dir, int count);
+void sortCsv(string dir, int count, vector<string> rating); // sotrs list of students by avarage score
 void ratingOut(string dir, int count);
 
 void main() {
@@ -23,7 +24,8 @@ void main() {
     vector<string> csvFiles = findCsv(dir);
     int budget = discardContract(dir, csvFiles);
     averageScore(dir, budget);
-    sorting(dir, budget);
+    vector<string> sortedScore = sortScores(dir, budget);
+    sortCsv(dir, budget, sortedScore);
     ratingOut(dir, budget);
 }
 
@@ -88,8 +90,8 @@ vector<string> findCsv(string dir) {
     int i = 0;
     do {
         allFiles.push_back(data.name);
-        if (allFiles[i] == "ratingTemp2.csv") {
-            deleteFile(dir, "\\ratingTemp2.csv");
+        if (allFiles[i] == "rating.csv") {
+            deleteFile(dir, "\\rating.csv");
             allFiles.erase(allFiles.begin() + i);
         }
         else i++;
@@ -133,7 +135,7 @@ void deleteFile(string dir, string name) {
     }
 
     int j = 0;
-    for (int i = dir.length(); i < dir.length() + name.length() + 1; i++)   // writes file type in const char
+    for (int i = dir.length(); i < dir.length() + name.length() + 1; i++)   // writes files in const char
     {
         charDir[i] = name[j];
         j++;
@@ -141,7 +143,7 @@ void deleteFile(string dir, string name) {
     remove(charDir);
 }
 
-void sorting(string dir, int count) {
+vector<string> sortScores(string dir, int count) {
     vector<string> rating;
     ifstream in(dir + "\\ratingTemp2.csv");
     for (int i = 0; i < count; i++)
@@ -149,7 +151,7 @@ void sorting(string dir, int count) {
         string line;
         string score;
         getline(in, line);
-        int pos = line.find_last_of(',')+1;
+        int pos = line.find_last_of(',') + 1;
         score = line.substr(pos);
         bool isExist = false;
         for (int i = 0; i < rating.size(); i++)
@@ -160,10 +162,11 @@ void sorting(string dir, int count) {
         else rating.push_back(score);
     }
     in.close();
-
-
     sort(rating.rbegin(), rating.rend(), greater<string>());
+    return rating;
+}
 
+void sortCsv(string dir, int count, vector<string> rating) {
     string line;
     string score;
     ofstream out(dir + "\\ratingTemp3.csv");
@@ -183,6 +186,7 @@ void sorting(string dir, int count) {
         rating.erase(rating.begin() + i);
     }
     out.close();
+    deleteFile(dir, "\\ratingTemp2.csv");
 }
 
 void ratingOut(string dir, int count) {
@@ -201,5 +205,6 @@ void ratingOut(string dir, int count) {
     }
     in.close();
     out.close();
+    deleteFile(dir, "\\ratingTemp3.csv");
 }
 
